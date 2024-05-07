@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "dgSpecHash": "L/JJ1GOK91n6JW6raZnS5UciTJZOImQ55tRrx9HYWqLoQuk1VXkDJ8LhbQV1I0bJP6++6B1Crv0yW1WazWNBQg==",
+  "success": true,
+  "projectFilePath": "/home/glanaro/Projects/chip-8/chip-8.csproj",
+  "expectedPackageFiles": [
+    "/home/glanaro/.nuget/packages/opentk/5.0.0-pre.10/opentk.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.audio.openal/5.0.0-pre.10/opentk.audio.openal.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.compute/5.0.0-pre.10/opentk.compute.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.core/5.0.0-pre.10/opentk.core.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.graphics/5.0.0-pre.10/opentk.graphics.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.input/5.0.0-pre.10/opentk.input.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.mathematics/5.0.0-pre.10/opentk.mathematics.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.platform.native/5.0.0-pre.10/opentk.platform.native.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.redist.glfw/3.3.8.39/opentk.redist.glfw.3.3.8.39.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.windowing.common/5.0.0-pre.10/opentk.windowing.common.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.windowing.desktop/5.0.0-pre.10/opentk.windowing.desktop.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/opentk.windowing.graphicslibraryframework/5.0.0-pre.10/opentk.windowing.graphicslibraryframework.5.0.0-pre.10.nupkg.sha512",
+    "/home/glanaro/.nuget/packages/system.runtime.compilerservices.unsafe/5.0.0/system.runtime.compilerservices.unsafe.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
