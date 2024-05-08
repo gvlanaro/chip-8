@@ -25,9 +25,9 @@
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.AssemblyInfo.cs
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.csproj.CoreCompileInputs.cache
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.sourcelink.json
-/home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.csproj.Up2Date
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.dll
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/refint/chip-8.dll
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.pdb
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/chip-8.genruntimeconfig.cache
 /home/glanaro/Projects/chip-8/obj/Debug/net8.0/ref/chip-8.dll
+/home/glanaro/projects/chip-8/obj/Debug/net8.0/chip-8.csproj.CopyComplete

@@ -4,8 +4,10 @@
     {
         static void Main(string [] args) 
         {
-            using Game game = new (800, 600, "LearnOpenTK");
-            game.Run();
+            using Window window = new (640, 320, "chip8");
+            //window.Run();
+            Emulator emulator = new Emulator(window, "roms/ibm_logo.ch8");
+            emulator.Run();
         }
     } 
 } 

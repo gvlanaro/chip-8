@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("chip-8")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3eb87d8f051c7c6518a132e96ac487741b5a0263")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+805ea80c528b9f6877c30216a4d15d60ebcdaf69")]
 [assembly: System.Reflection.AssemblyProductAttribute("chip-8")]
 [assembly: System.Reflection.AssemblyTitleAttribute("chip-8")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

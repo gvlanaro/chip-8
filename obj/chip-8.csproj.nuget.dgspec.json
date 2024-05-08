@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/glanaro/Projects/chip-8/chip-8.csproj": {}
+    "/home/glanaro/projects/chip-8/chip-8.csproj": {}
   },
   "projects": {
-    "/home/glanaro/Projects/chip-8/chip-8.csproj": {
+    "/home/glanaro/projects/chip-8/chip-8.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/glanaro/Projects/chip-8/chip-8.csproj",
+        "projectUniqueName": "/home/glanaro/projects/chip-8/chip-8.csproj",
         "projectName": "chip-8",
-        "projectPath": "/home/glanaro/Projects/chip-8/chip-8.csproj",
+        "projectPath": "/home/glanaro/projects/chip-8/chip-8.csproj",
         "packagesPath": "/home/glanaro/.nuget/packages/",
-        "outputPath": "/home/glanaro/Projects/chip-8/obj/",
+        "outputPath": "/home/glanaro/projects/chip-8/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/glanaro/.nuget/NuGet/NuGet.Config"
@@ -32,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -64,7 +59,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.103/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
