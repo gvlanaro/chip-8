@@ -9,7 +9,6 @@
 /home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Graphics.dll
 /home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Input.dll
 /home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Mathematics.dll
-/home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Platform.Native.dll
 /home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Windowing.Common.dll
 /home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Windowing.Desktop.dll
 /home/glanaro/Projects/chip-8/bin/Debug/net8.0/OpenTK.Windowing.GraphicsLibraryFramework.dll

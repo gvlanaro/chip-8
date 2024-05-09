@@ -1,6 +1,3 @@
-using System.Collections;
-using OpenTK.Core.Platform;
-using OpenTK.Graphics.OpenGL;
 
 public class Emulator
 {
