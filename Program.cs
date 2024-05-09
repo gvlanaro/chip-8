@@ -1,13 +1,12 @@
-﻿namespace Chip8
+﻿using System.Net;
+
+static class Program 
 {
-    static class Program 
+    static void Main(string [] args) 
     {
-        static void Main(string [] args) 
-        {
-            using Window window = new (640, 320, "chip8");
-            //window.Run();
-            Emulator emulator = new Emulator(window, "roms/ibm_logo.ch8");
-            emulator.Run();
-        }
-    } 
+        Emulator emulator = new Emulator("roms/ibm_logo.ch8");
+        using Window window = new (640, 320, "chip8", emulator);
+
+        window.Run();
+    }
 } 
