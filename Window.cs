@@ -2,16 +2,18 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK.Mathematics;
+using System.IO.Compression;
 
 public class Window : GameWindow
 {
 
     private float[] _vertices =
     {
-        0.5f,  0.5f, 0.0f, // top right
-        0.5f, -0.5f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f, // top left
+        20.0f, 10.0f, 0.0f, // top right
+        20.0f, 0.0f, 0.0f, // bottom right
+        10.0f, 0.0f, 0.0f, // bottom left
+        10.0f, 10.0f, 0.0f, // top left
     };
 
     // Then, we create a new array: indices.
@@ -23,6 +25,9 @@ public class Window : GameWindow
         1, 2, 3  // Then the second will be the bottom-left half of the triangle
     };
 
+    private const int width = 640;
+    private const int height = 320;
+
     private int _vertexBufferObject;
 
     private int _vertexArrayObject;
@@ -31,6 +36,8 @@ public class Window : GameWindow
 
     private int _elementBufferObject;
 
+    private Matrix4 _projection;
+    
     private Emulator emulator;
     public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { Size = (width, height), Title = title }) 
     { 
@@ -43,39 +50,15 @@ public class Window : GameWindow
 
         GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-        //Code goes here
-
         _vertexBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
-        GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
-
+        
         _vertexArrayObject = GL.GenVertexArray();
-        GL.BindVertexArray(_vertexArrayObject);
 
-        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
-        GL.EnableVertexAttribArray(0);
-
-        // We create/bind the Element Buffer Object EBO the same way as the VBO, except there is a major difference here which can be REALLY confusing.
-        // The binding spot for ElementArrayBuffer is not actually a global binding spot like ArrayBuffer is. 
-        // Instead it's actually a property of the currently bound VertexArrayObject, and binding an EBO with no VAO is undefined behaviour.
-        // This also means that if you bind another VAO, the current ElementArrayBuffer is going to change with it.
-        // Another sneaky part is that you don't need to unbind the buffer in ElementArrayBuffer as unbinding the VAO is going to do this,
-        // and unbinding the EBO will remove it from the VAO instead of unbinding it like you would for VBOs or VAOs.
         _elementBufferObject = GL.GenBuffer();
-        GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
-        // We also upload data to the EBO the same way as we did with VBOs.
-        GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
-        // The EBO has now been properly setup. Go to the Render function to see how we draw our rectangle now!
 
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
-        _shader.Use();
-    }
-
-    protected override void OnUnload()
-    {
-        base.OnUnload();
-
-        _shader.Dispose();
+        _projection = Matrix4.CreateOrthographicOffCenter(0.0f, width, 0.0f, height, -1.0f, 1.0f);
+        _shader.SetMatrix4("projection", _projection);
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -85,11 +68,71 @@ public class Window : GameWindow
         GL.Clear(ClearBufferMask.ColorBufferBit);
 
         //Code goes here.
+        emulator.Cycle();
+
+        // dopo ogni ciclo controllo la variabile Display dell'emulatore e per ogni '1' creo il 'pixel'
+        // le dimensioni di display sono fisse (640,320) poi vengono scalate automaticamente tramite Viewport
+        for (int x = 0; x < 64; x++)
+        {   
+            for (int y = 0; y < 32; y++)
+            {
+                // draw pixel/rectangle (white)
+                if (emulator.Display[x,y] == 1)
+                {
+                    drawRect(x,y);
+                }
+            }
+        }
+
+        SwapBuffers();
+    }
+
+    private void drawRect(int x, int y)
+    {
+        // 64 to 640 and 32 to 320
+        x*=10;
+        y*=10;
+
+        float[] _vertices =
+        {
+            x+10, y+10, 0.0f, // top right
+            x+10, y,    0.0f, // bottom right
+            x,    y,    0.0f, // bottom left
+            x,    y+10, 0.0f, // top left
+        };
+
+
+
+        // preparations
+        //_vertexBufferObject = GL.GenBuffer();
+        //GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+        GL.BufferData(BufferTarget.ArrayBuffer, _vertices.Length * sizeof(float), _vertices, BufferUsageHint.StaticDraw);
+        GL.BindBuffer(BufferTarget.ArrayBuffer, _vertexBufferObject);
+
+        //_vertexArrayObject = GL.GenVertexArray();
+        //GL.BindVertexArray(_vertexArrayObject);
+        GL.BindVertexArray(_vertexArrayObject);
+
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+        GL.EnableVertexAttribArray(0);
+                
+        // We create/bind the Element Buffer Object EBO the same way as the VBO, except there is a major difference here which can be REALLY confusing.
+        // The binding spot for ElementArrayBuffer is not actually a global binding spot like ArrayBuffer is. 
+        // Instead it's actually a property of the currently bound VertexArrayObject, and binding an EBO with no VAO is undefined behaviour.
+        // This also means that if you bind another VAO, the current ElementArrayBuffer is going to change with it.
+        // Another sneaky part is that you don't need to unbind the buffer in ElementArrayBuffer as unbinding the VAO is going to do this,
+        // and unbinding the EBO will remove it from the VAO instead of unbinding it like you would for VBOs or VAOs.
+        //_elementBufferObject = GL.GenBuffer();
+        //GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
+        // We also upload data to the EBO the same way as we did with VBOs.
+        GL.BindBuffer(BufferTarget.ElementArrayBuffer, _elementBufferObject);
+        GL.BufferData(BufferTarget.ElementArrayBuffer, _indices.Length * sizeof(uint), _indices, BufferUsageHint.StaticDraw);
+        // The EBO has now been properly setup. Go to the Render function to see how we draw our rectangle now!
+
+
         _shader.Use();
 
-        // Because ElementArrayObject is a property of the currently bound VAO,
-        // the buffer you will find in the ElementArrayBuffer will change with the currently bound VAO.
-        GL.BindVertexArray(_vertexArrayObject);
+        
 
         // Then replace your call to DrawTriangles with one to DrawElements
         // Arguments:
@@ -99,8 +142,8 @@ public class Window : GameWindow
         //   Offset in the EBO. Set this to 0 because we want to draw the whole thing.
         GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
 
-        SwapBuffers();
-    } 
+    }
+
     protected override void OnFramebufferResize(FramebufferResizeEventArgs e)
     {
         base.OnFramebufferResize(e);
@@ -113,6 +156,9 @@ public class Window : GameWindow
 
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
+            GL.DeleteVertexArray(_vertexArrayObject);
+            GL.DeleteBuffer(_vertexArrayObject);
+            GL.DeleteBuffer(_elementBufferObject);
             Close();
         }
     }

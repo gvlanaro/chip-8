@@ -54,7 +54,7 @@ public class Emulator
         // fetch 
         PC+=2;
         ushort OpCode = (ushort)((Memory[PC] << 8) | Memory[PC+1]);  // combines 2 bytes (instructions for chip8 are 16bits)
-
+        System.Console.WriteLine("last code: " + OpCode);
         // decode and execute (switch case)
         byte fNibble = (byte)(OpCode >> 12);     // first nibble (half byte) (ho usato byte per salvare perchè non ci sono tipi minori)
         byte X = (byte)((OpCode & 0x0F00) >> 8); 
@@ -95,31 +95,63 @@ public class Emulator
         
     }
 
+        private void Drawa(byte X, byte Y, byte N)
+        {
+            // Initialize the collision detection as no collision detected (yet).
+            V[0xF] = 0;
+
+            // Draw N lines on the screen.
+            for (int line = 0; line < N; line++)
+            {
+                // y is the starting line Y + current line. If y is larger than the total width of the screen then wrap around (this is the modulo operation).
+                var y = (V[Y] + line) % 32;
+
+                // The current sprite being drawn, each line is a new sprite.
+                byte sprite = Memory[I + line];
+
+                // Each bit in the sprite is a pixel on or off.
+                for (int column = 0; column < 8; column++)
+                {
+                    // Start with the current most significant bit. The next bit will be left shifted in from the right.
+                    if ((sprite & 0x80) != 0)
+                    {
+                        // Get the current x position and wrap around if needed.
+                        var x = (V[X] + column) % 64;
+
+                        // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
+                        if (Display[x,y] == 1)
+                        {
+                            V[0xF] = 1;
+                        }
+
+                        // Enable or disable the pixel (XOR operation).
+                        Display[x,y] ^= 1;
+                    }
+
+                    // Shift the next bit in from the right.
+                    sprite <<= 0x1;
+                }
+            }
+        }
+
     private void Draw(byte X, byte Y, byte N)
     {
         // set the coordinates (the modulo helps with wrapping the screen if needed) 
-        var cX = V[X] % 64;
-        var cY = V[Y] % 32;
-        
-        // collision deteciton
+
+        // collision detection
         V[0xF] = 0;
 
         // for N rows
         for (int row = 0; row < N; row++)
         {
-            // if you reach the bottom edge of the screen stop drawing
-            if (cX >= 64)
-                break;
-
+            var cY = (V[Y] + row) % 32;
             // get the sprite data of the current row (I contains the sprite)
             byte sprite_data = Memory[I + row];
 
             // for each of the 8 pixels in this sprite row (from least significant)
             for (int pixel = 0; pixel < 8; pixel++)
             {
-                // if you reach the right edge of the screen stop drawing this row
-                if (cX >= 64)
-                    break;
+                var cX = (V[X] + pixel) % 64;
 
                 var currPixel = (sprite_data >> pixel) & 1;    // get bit in position 'pixel'
 
@@ -133,9 +165,7 @@ public class Emulator
                     {
                         Display[cX,cY] = 1;
                     }
-                cX ++;
             }
-            cY++;
         }
     }
 }
