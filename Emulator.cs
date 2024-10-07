@@ -1,4 +1,6 @@
 
+using System.Collections;
+
 public class Emulator
 {
     private byte[] Fonts =
@@ -20,7 +22,6 @@ public class Emulator
             0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
             0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
-
     public byte[] Memory { get; set; }
     public byte[,] Display { get; set; } 
     public ushort PC { get; set; }
@@ -30,11 +31,8 @@ public class Emulator
     public byte Sound_timer { get; set; }
     public byte[] V { get; set; }
     public ushort OpCode { get; set; }
-
     const ushort RomStart = 0x200;
-
     public Emulator(string rom_path) {
-
         Memory = new byte[4096];
         Display = new byte[64, 32];
         PC = RomStart;
@@ -47,7 +45,6 @@ public class Emulator
         Fonts.CopyTo(Memory, 0x00);
         byte[] rom = File.ReadAllBytes(rom_path);
         rom.CopyTo(Memory, RomStart);
-
     }
 
     public void Cycle() {
@@ -72,6 +69,8 @@ public class Emulator
             case 0x1:
                 // jump to address NNN
                 PC = NNN;
+                // remove the +2 since this is a jump
+                PC-=2;
                 break;
             case 0x6:
                 // set register VX
@@ -94,78 +93,34 @@ public class Emulator
         }
         
     }
-
-        private void Drawa(byte X, byte Y, byte N)
-        {
-            // Initialize the collision detection as no collision detected (yet).
-            V[0xF] = 0;
-
-            // Draw N lines on the screen.
-            for (int line = 0; line < N; line++)
-            {
-                // y is the starting line Y + current line. If y is larger than the total width of the screen then wrap around (this is the modulo operation).
-                var y = (V[Y] + line) % 32;
-
-                // The current sprite being drawn, each line is a new sprite.
-                byte sprite = Memory[I + line];
-
-                // Each bit in the sprite is a pixel on or off.
-                for (int column = 0; column < 8; column++)
-                {
-                    // Start with the current most significant bit. The next bit will be left shifted in from the right.
-                    if ((sprite & 0x80) != 0)
-                    {
-                        // Get the current x position and wrap around if needed.
-                        var x = (V[X] + column) % 64;
-
-                        // Collision detection: If the target pixel is already set then set the collision detection flag in register VF.
-                        if (Display[x,y] == 1)
-                        {
-                            V[0xF] = 1;
-                        }
-
-                        // Enable or disable the pixel (XOR operation).
-                        Display[x,y] ^= 1;
-                    }
-
-                    // Shift the next bit in from the right.
-                    sprite <<= 0x1;
-                }
-            }
-        }
-
     private void Draw(byte X, byte Y, byte N)
     {
-        // set the coordinates (the modulo helps with wrapping the screen if needed) 
-
         // collision detection
         V[0xF] = 0;
 
-        // for N rows
         for (int row = 0; row < N; row++)
         {
             var cY = (V[Y] + row) % 32;
-            // get the sprite data of the current row (I contains the sprite)
-            byte sprite_data = Memory[I + row];
-
-            // for each of the 8 pixels in this sprite row (from least significant)
-            for (int pixel = 0; pixel < 8; pixel++)
+            
+            byte sprite_data = Memory[I + row];         // metodo alternativo: BitArray sprite_data = new BitArray(new byte[] { Memory[I + row] });
+            int iX = 0;
+            for (int pixel = 7; pixel >= 0; pixel--)
             {
-                var cX = (V[X] + pixel) % 64;
+                var cX = (V[X] + iX) % 64;
+                iX++;
 
-                var currPixel = (sprite_data >> pixel) & 1;    // get bit in position 'pixel'
+                //get most significant bit
+                int shifted = sprite_data >> pixel;
 
-                if (currPixel == 1)
+                if ((shifted & 1)!= 0)
+                {
                     if (Display[cX,cY] == 1)
-                    {
-                        Display[cX,cY] = 0;
                         V[0xF] = 1;
-                    }
-                    else
-                    {
-                        Display[cX,cY] = 1;
-                    }
+                    // Enable or disable the pixel (XOR operation).
+                    Display[cX,cY] ^= 1;
+                }
             }
+            
         }
     }
 }
