@@ -3,8 +3,6 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
-using System.IO.Compression;
-
 public class Window : GameWindow
 {
     private const int width = 640;

@@ -1,5 +1,5 @@
-
 using System.Collections;
+using System.ComponentModel;
 
 public class Emulator
 {
@@ -48,51 +48,145 @@ public class Emulator
     }
 
     public void Cycle() {
-        // fetch 
         PC+=2;
         ushort OpCode = (ushort)((Memory[PC] << 8) | Memory[PC+1]);  // combines 2 bytes (instructions for chip8 are 16bits)
+        
         System.Console.WriteLine("last code: " + OpCode);
-        // decode and execute (switch case)
-        byte fNibble = (byte)(OpCode >> 12);     // first nibble (half byte) (ho usato byte per salvare perchè non ci sono tipi minori)
-        byte X = (byte)((OpCode & 0x0F00) >> 8); 
-        byte Y = (byte)((OpCode & 0x00F0) >> 4); 
-        byte N = (byte)(OpCode & 0x000F); 
-        byte NN = (byte)(OpCode & 0x00FF); 
-        ushort NNN = (ushort)(OpCode & 0x0FFF); 
+
+        byte fNibble = (byte)(OpCode >> 12);        // first nibble (4-bit value)
+        byte x = (byte)((OpCode & 0x0F00) >> 8);    // A 4-bit value, the lower 4 bits of the high byte of the instruction 
+        byte y = (byte)((OpCode & 0x00F0) >> 4);    // A 4-bit value, the upper 4 bits of the low byte of the instruction 
+        byte n = (byte)(OpCode & 0x000F);           // A 4-bit value, the lowest 4 bits of the instruction
+        byte kk = (byte)(OpCode & 0x00FF);          // An 8-bit value, the lowest 8 bits of the instruction 
+        ushort nnn = (ushort)(OpCode & 0x0FFF);     // A 12-bit value, the lowest 12 bits of the instruction 
 
         switch (fNibble)
         {
             case 0x0 when OpCode == 0x00E0:
-                // clear screen
-                Display = new byte [64, 32];
+                I00E0();
+                break;
+            case 0x0 when OpCode == 0x00EE:
+                I00EE();
+                break;
+            case 0x0:
+                I0nnn();
                 break;
             case 0x1:
-                // jump to address NNN
-                PC = NNN;
-                // remove the +2 since this is a jump
-                PC-=2;
+                I1nnn(nnn);
                 break;
+            case 0x2:
+                I2nnn(nnn);
+                break;
+            case 0x3:
+                I3xkk(x, kk);
+                break;
+            case 0x4:
+                I4xkk(x, kk);
+                break;
+            case 0x5:
+                I5xy0(x, y);
+                break;          
             case 0x6:
-                // set register VX
-                V[X] = NN;
+                I6xkk(x, kk);
                 break;
             case 0x7:
-                // add to VX
-                V[X] += NN;
+                I7xkk(x, kk);
                 break;
             case 0xA:
                 // set I
-                I = NNN;
+                I = nnn;
                 break;
             case 0xD:
                 // display/draw
-                Draw(X, Y, N);
+                Draw(x, y, n);
                 break;
             default:
                 break;
         }
         
     }
+
+    private void I7xkk(byte x, byte kk)
+    {
+        // Set Vx = Vx + kk.
+        // Adds the value kk to the value of register Vx, then stores the result in Vx. 
+        V[x] += kk;
+    }
+
+    private void I6xkk(byte x, byte kk)
+    {
+        // Set Vx = kk.
+        // The interpreter puts the value kk into register Vx.
+        V[x] = kk;
+    }
+
+    private void I5xy0(byte x, byte y)
+    {
+        // Skip next instruction if Vx = Vy.
+        // The interpreter compares register Vx to register Vy, and if they are equal, increments the program counter by 2.
+        if (V[x] == V[y])
+        {
+            PC += 2;
+        }
+    }
+
+    private void I4xkk(byte x, byte kk)
+    {
+        // Skip next instruction if Vx != kk.
+        // The interpreter compares register Vx to kk, and if they are not equal, increments the program counter by 2.
+        if (V[x] != kk)
+        {
+            PC += 2;
+        }
+    }
+
+    private void I3xkk(byte x, byte kk)
+    {
+        // Skip next instruction if Vx = kk.
+        // The interpreter compares register Vx to kk, and if they are equal, increments the program counter by 2.
+        if (V[x] == kk)
+        {
+            PC += 2;
+        }
+    }
+
+    private void I2nnn(ushort nnn)
+    {
+        // Call subroutine at nnn.
+        // The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
+        Stack.Pop();
+        Stack.Push(PC);
+        PC = nnn;
+    }
+
+    private void I1nnn(ushort nnn)
+    {
+        // Jump to location nnn.
+        // The interpreter sets the program counter to nnn.
+        PC = nnn;
+        // this is to ignore the next +2
+        PC-=2;
+    }
+
+    private void I0nnn()
+    {
+        // Jump to a machine code routine at nnn.
+        // This instruction is only used on the old computers on which Chip-8 was originally implemented. It is ignored by modern interpreters.
+    }
+
+    private void I00EE()
+    {
+        // Return from a subroutine.
+        // The interpreter sets the program counter to the address at the top of the stack, then subtracts 1 from the stack pointer.
+        PC = Stack.Pop();
+    }
+
+    private void I00E0()
+    {
+        // Clear the display.
+        Display = new byte [64, 32];
+    }
+
     private void Draw(byte X, byte Y, byte N)
     {
         // collision detection
