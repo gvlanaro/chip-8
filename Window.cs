@@ -13,16 +13,42 @@ public class Window : GameWindow
     private Shader _shader;
     private Matrix4 _projection;
     private Emulator emulator;
+    private Dictionary<int, byte> Emu_Keys = new Dictionary<int, byte> 
+    {
+        {10, 0x0},
+        {11, 0x1},
+        {12, 0x2},
+        {13, 0x3},
+        {24, 0x4},
+        {25, 0x5},
+        {26, 0x6},
+        {27, 0x7},
+        {38, 0x8},
+        {39, 0x9},
+        {40, 0xA},
+        {41, 0xB},
+        {52, 0xC},
+        {53, 0xD},
+        {54, 0xE},
+        {55, 0xF}
+    };
     public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title }) 
     { 
-        emulator = new Emulator("roms/ibm_logo.ch8");
+        emulator = new Emulator("roms/3-corax+.ch8");
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
+    }
+
+    protected override void OnKeyDown(KeyboardKeyEventArgs e) {
+        emulator.Keys[Emu_Keys[e.ScanCode]] = true;
+    }
+
+    protected override void OnKeyUp(KeyboardKeyEventArgs e) {
+        emulator.Keys[Emu_Keys[e.ScanCode]] = false;
     }
 
     protected override void OnLoad()
     {
         base.OnLoad();
-
         GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         VBO = GL.GenBuffer();
