@@ -3,6 +3,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
+
 public class Window : GameWindow
 {
     private const int width = 640;
@@ -15,26 +16,26 @@ public class Window : GameWindow
     private Emulator emulator;
     private Dictionary<int, byte> Emu_Keys = new Dictionary<int, byte> 
     {
-        {10, 0x0},
-        {11, 0x1},
-        {12, 0x2},
-        {13, 0x3},
+        {10, 0x1},
+        {11, 0x2},
+        {12, 0x3},
+        {13, 0xC},
         {24, 0x4},
         {25, 0x5},
         {26, 0x6},
-        {27, 0x7},
-        {38, 0x8},
-        {39, 0x9},
-        {40, 0xA},
-        {41, 0xB},
-        {52, 0xC},
-        {53, 0xD},
-        {54, 0xE},
+        {27, 0xD},
+        {38, 0x7},
+        {39, 0x8},
+        {40, 0x9},
+        {41, 0xE},
+        {52, 0xA},
+        {53, 0x0},
+        {54, 0xB},
         {55, 0xF}
     };
-    public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title }) 
+    public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
     { 
-        emulator = new Emulator("roms/3-corax+.ch8");
+        emulator = new Emulator("roms/5-quirks.ch8");
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     }
 
@@ -64,14 +65,24 @@ public class Window : GameWindow
         base.OnRenderFrame(e);
 
         GL.Clear(ClearBufferMask.ColorBufferBit);
-
+        
         emulator.Cycle();
+        
+        checkSoundTimer();
         
         for (int x = 0; x < 64; x++)
             for (int y = 0; y < 32; y++)
                 if (emulator.Display[x,y] == 1)
                     drawRect(x,y);
         SwapBuffers();
+    }
+
+    private void checkSoundTimer()
+    {
+        if (emulator.Sound_timer > 0)
+        {
+            Console.Beep();
+        }
     }
 
     private void drawRect(int x, int y)

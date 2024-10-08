@@ -1,6 +1,7 @@
 using System.Collections;
 using System.ComponentModel;
 using Microsoft.VisualBasic;
+using OpenTK.Windowing.Common;
 
 public class Emulator
 {
@@ -34,8 +35,11 @@ public class Emulator
     public byte[] V { get; set; }
     public ushort OpCode { get; set; }
     const ushort RomStart = 0x200;
+    private uint TimeCounter;
     public Emulator(string rom_path) {
+        TimeCounter = 0;
         Keys = new bool[16];
+
         Memory = new byte[4096];
         Display = new byte[64, 32];
         PC = RomStart;
@@ -171,6 +175,24 @@ public class Emulator
             default:
                 break;
         }
+
+        UpdateTimers();
+    }
+
+    private void UpdateTimers()
+    {
+        if (TimeCounter % 10 == 0)
+        {
+            if (Delay_Timer > 0)
+            {
+                Delay_Timer--;
+            }
+            if (Sound_timer > 0)
+            {   
+                Sound_timer--;
+            }
+        }
+        TimeCounter++;
     }
 
     private void IFx65(byte x)
@@ -311,61 +333,64 @@ public class Emulator
     {
         // Set Vx = Vx SHL 1.
         // If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2
-    
-        if ((V[x] & 0x80) == 1)
-            V[0xF] = 1;
-        else
-            V[0xF] = 0;
-
-        V[x] <<= 0x1;
+        byte temp = V[x];
+        int tempF = temp >> 7;
+        temp <<= 1;
+        V[x] = temp;
+        V[0xF] = (byte)tempF;
     }
 
     private void I8xy7(byte x, byte y)
     {
         // Set Vx = Vy - Vx, set VF = NOT borrow.
         // If Vy > Vx, then VF is set to 1, otherwise 0. Then Vx is subtracted from Vy, and the results stored in Vx.
-        if (V[y] > V[x])
-            V[0xF] = 1;
-        else
-            V[0xF] = 0;
+        byte temp = (byte)(V[y] - V[x]);
+        byte tempF = 0;
+        if (V[y] >= V[x])
+            tempF = 1;
             
-        V[x] = (byte)(V[y] - V[x]);
+        V[x] = temp;
+        V[0xF] = tempF;
     }
 
     private void I8xy6(byte x, byte y)
     {
         // Set Vx = Vx SHR 1.
         // If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
+        byte temp = V[x];
+        byte tempF = 0;
         if ((V[x] & 1) == 1)
-            V[0xF] = 1;
-        else
-            V[0xF] = 0;
+            tempF = 1;
 
-        V[x] >>= 1;
+        temp >>= 1;
+        V[x] = temp;
+        V[0xF] = tempF;
     }
 
     private void I8xy5(byte x, byte y)
     {
         // Set Vx = Vx - Vy, set VF = NOT borrow.
         // If Vx > Vy, then VF is set to 1, otherwise 0. Then Vy is subtracted from Vx, and the results stored in Vx.
-        if (V[x] > V[y])
-            V[0xF] = 1;
-        else
-            V[0xF] = 0;
+        byte temp = (byte)(V[x] - V[y]);
+        byte tempF = 0;
+        if (V[x] >= V[y])
+            tempF = 1;
 
-        V[x] -= V[y];
+        V[x] = temp;
+        V[0xF] = tempF;
     }
 
     private void I8xy4(byte x, byte y)
     {
         // Set Vx = Vx + Vy, set VF = carry.
         // The values of Vx and Vy are added together. If the result is greater than 8 bits (i.e., > 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored in Vx.
-        V[x] += V[y];
-
-        if (V[x] > 255)
-            V[0xF] = 1;
-        else
-            V[0xF] = 0;
+        ushort temp = (ushort)(V[x] + V[y]);
+        byte tempF = 0;
+        if (temp > 255)
+            tempF = 1;
+        V[x] = (byte)(temp & 255);
+        V[0xF] = tempF;
+            
     }
 
     private void I8xy3(byte x, byte y)
