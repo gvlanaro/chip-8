@@ -22,7 +22,7 @@ public class Emulator
     };
     public bool[] Keys;
     public byte[] Memory { get; set; }
-    public byte[,] Display { get; set; } 
+    public byte[,] Display { get; set; }
     public ushort PC { get; set; }
     public ushort I { get; set; }
     public Stack<ushort> Stack { get; set; }
@@ -32,7 +32,8 @@ public class Emulator
     public ushort OpCode { get; set; }
     const ushort RomStart = 0x200;
     private uint TimeCounter;
-    public Emulator(string rom_path) {
+    public Emulator(string rom_path)
+    {
         TimeCounter = 0;
         Keys = new bool[16];
 
@@ -50,9 +51,9 @@ public class Emulator
         rom.CopyTo(Memory, RomStart);
     }
 
-    public void Cycle() {
-        
-        ushort OpCode = (ushort)((Memory[PC] << 8) | Memory[PC+1]);  // combines 2 bytes (instructions for chip8 are 16bits)
+    public void Cycle()
+    {
+        ushort OpCode = (ushort)((Memory[PC] << 8) | Memory[PC + 1]);  // combines 2 bytes (instructions for chip8 are 16bits)
         byte fNibble = (byte)(OpCode >> 12);        // first nibble (4-bit value)
         byte x = (byte)((OpCode & 0x0F00) >> 8);    // A 4-bit value, the lower 4 bits of the high byte of the instruction 
         byte y = (byte)((OpCode & 0x00F0) >> 4);    // A 4-bit value, the upper 4 bits of the low byte of the instruction 
@@ -85,7 +86,7 @@ public class Emulator
                 break;
             case 0x5:
                 I5xy0(x, y);
-                break;          
+                break;
             case 0x6:
                 I6xkk(x, kk);
                 break;
@@ -184,7 +185,7 @@ public class Emulator
                 Delay_Timer--;
             }
             if (Sound_timer > 0)
-            {   
+            {
                 Sound_timer--;
             }
         }
@@ -197,7 +198,7 @@ public class Emulator
         // The interpreter reads values from memory starting at location I into registers V0 through Vx.
         for (int i = 0; i <= x; i++)
         {
-            V[i] = Memory[I+i];
+            V[i] = Memory[I + i];
         }
         I += (byte)(x + 1);
     }
@@ -208,7 +209,7 @@ public class Emulator
         // The interpreter copies the values of registers V0 through Vx into memory, starting at the address in I.
         for (int i = 0; i <= x; i++)
         {
-            Memory[I+i] = V[i];
+            Memory[I + i] = V[i];
         }
         I += (byte)(x + 1);
     }
@@ -217,8 +218,8 @@ public class Emulator
     {
         // Store BCD representation of Vx in memory locations I, I+1, and I+2.
         // The interpreter takes the decimal value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.
-        Memory[I+2] = (byte)(V[x] % 10);               // ones
-        Memory[I+1] = (byte)((V[x] / 10) % 10);        // tens
+        Memory[I + 2] = (byte)(V[x] % 10);               // ones
+        Memory[I + 1] = (byte)((V[x] / 10) % 10);        // tens
         Memory[I] = (byte)((V[x] / 100) % 10);       // hundreds
     }
 
@@ -262,7 +263,6 @@ public class Emulator
                 return;
             }
         }
-
         // no button pressed, loop until one is
         PC -= 2;
     }
@@ -278,9 +278,9 @@ public class Emulator
     {
         // Skip next instruction if key with the value of Vx is pressed.
         // Checks the keyboard, and if the key corresponding to the value of Vx is currently in the down position, PC is increased by 2.
-        if(Keys[V[x]])
+        if (Keys[V[x]])
         {
-            PC +=2;
+            PC += 2;
         }
     }
 
@@ -288,9 +288,9 @@ public class Emulator
     {
         // Skip next instruction if key with the value of Vx is not pressed.
         // Checks the keyboard, and if the key corresponding to the value of Vx is currently in the up position, PC is increased by 2.
-        if(!Keys[V[x]])
+        if (!Keys[V[x]])
         {
-            PC +=2;
+            PC += 2;
         }
     }
 
@@ -345,8 +345,9 @@ public class Emulator
         byte temp = (byte)(V[y] - V[x]);
         byte tempF = 0;
         if (V[y] >= V[x])
+        {
             tempF = 1;
-            
+        }
         V[x] = temp;
         V[0xF] = tempF;
     }
@@ -358,8 +359,9 @@ public class Emulator
         byte temp = V[y];
         byte tempF = 0;
         if ((V[y] & 1) == 1)
+        {
             tempF = 1;
-
+        }
         temp >>= 1;
         V[x] = temp;
         V[0xF] = tempF;
@@ -372,8 +374,9 @@ public class Emulator
         byte temp = (byte)(V[x] - V[y]);
         byte tempF = 0;
         if (V[x] >= V[y])
+        {
             tempF = 1;
-
+        }
         V[x] = temp;
         V[0xF] = tempF;
     }
@@ -385,10 +388,12 @@ public class Emulator
         ushort temp = (ushort)(V[x] + V[y]);
         byte tempF = 0;
         if (temp > 255)
+        {
             tempF = 1;
+        }
         V[x] = (byte)(temp & 255);
         V[0xF] = tempF;
-            
+
     }
 
     private void I8xy3(byte x, byte y)
@@ -500,7 +505,7 @@ public class Emulator
     private void I00E0()
     {
         // Clear the display.
-        Display = new byte [64, 32];
+        Display = new byte[64, 32];
     }
 
     private void IDxyn(byte X, byte Y, byte N)
@@ -516,7 +521,7 @@ public class Emulator
         for (int row = 0; row < N; row++)
         {
             var cY = (V[Y] + row) % 32;
-            
+
             byte sprite_data = Memory[I + row];         // alternative: BitArray sprite_data = new BitArray(new byte[] { Memory[I + row] });
             int iX = 0;
             for (int pixel = 7; pixel >= 0; pixel--)
@@ -526,15 +531,16 @@ public class Emulator
 
                 int shifted = sprite_data >> pixel;     // get most significant bit
 
-                if ((shifted & 1)!= 0)
+                if ((shifted & 1) != 0)
                 {
-                    if (Display[cX,cY] == 1)
+                    if (Display[cX, cY] == 1)
+                    {
                         V[0xF] = 1;
-                    
-                    Display[cX,cY] ^= 1;                // enable or disable the pixel (XOR operation).
+                    }
+                    Display[cX, cY] ^= 1;                // enable or disable the pixel (XOR operation).
                 }
             }
-            
+
         }
     }
 }
