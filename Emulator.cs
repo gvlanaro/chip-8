@@ -1,8 +1,4 @@
 using System.Collections;
-using System.ComponentModel;
-using Microsoft.VisualBasic;
-using OpenTK.Windowing.Common;
-
 public class Emulator
 {
     private byte[] Fonts =
@@ -55,9 +51,8 @@ public class Emulator
     }
 
     public void Cycle() {
-        PC += 2;
+        
         ushort OpCode = (ushort)((Memory[PC] << 8) | Memory[PC+1]);  // combines 2 bytes (instructions for chip8 are 16bits)
-
         byte fNibble = (byte)(OpCode >> 12);        // first nibble (4-bit value)
         byte x = (byte)((OpCode & 0x0F00) >> 8);    // A 4-bit value, the lower 4 bits of the high byte of the instruction 
         byte y = (byte)((OpCode & 0x00F0) >> 4);    // A 4-bit value, the upper 4 bits of the low byte of the instruction 
@@ -177,6 +172,7 @@ public class Emulator
         }
 
         UpdateTimers();
+        PC += 2;
     }
 
     private void UpdateTimers()
@@ -203,6 +199,7 @@ public class Emulator
         {
             V[i] = Memory[I+i];
         }
+        I += (byte)(x + 1);
     }
 
     private void IFx55(byte x)
@@ -213,6 +210,7 @@ public class Emulator
         {
             Memory[I+i] = V[i];
         }
+        I += (byte)(x + 1);
     }
 
     private void IFx33(byte x)
@@ -333,7 +331,7 @@ public class Emulator
     {
         // Set Vx = Vx SHL 1.
         // If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is multiplied by 2
-        byte temp = V[x];
+        byte temp = V[y];
         int tempF = temp >> 7;
         temp <<= 1;
         V[x] = temp;
@@ -357,9 +355,9 @@ public class Emulator
     {
         // Set Vx = Vx SHR 1.
         // If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is divided by 2.
-        byte temp = V[x];
+        byte temp = V[y];
         byte tempF = 0;
-        if ((V[x] & 1) == 1)
+        if ((V[y] & 1) == 1)
             tempF = 1;
 
         temp >>= 1;
@@ -398,6 +396,7 @@ public class Emulator
         // Set Vx = Vx XOR Vy.
         // Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result in Vx. An exclusive OR compares the corrseponding bits from two values, and if the bits are not both the same, then the corresponding bit in the result is set to 1. Otherwise, it is 0. 
         V[x] = (byte)(V[x] ^ V[y]);
+        V[0xF] = 0;
     }
 
     private void I8xy2(byte x, byte y)
@@ -405,6 +404,7 @@ public class Emulator
         // Set Vx = Vx AND Vy.
         // Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx. A bitwise AND compares the corrseponding bits from two values, and if both bits are 1, then the same bit in the result is also 1. Otherwise, it is 0. 
         V[x] = (byte)(V[x] & V[y]);
+        V[0xF] = 0;
     }
 
     private void I8xy1(byte x, byte y)
@@ -412,6 +412,7 @@ public class Emulator
         // Set Vx = Vx OR Vy.
         // Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A bitwise OR compares the corrseponding bits from two values, and if either bit is 1, then the same bit in the result is also 1. Otherwise, it is 0.
         V[x] = (byte)(V[x] | V[y]);
+        V[0xF] = 0;
     }
 
     private void I8xy0(byte x, byte y)
@@ -469,6 +470,7 @@ public class Emulator
     {
         // Call subroutine at nnn.
         // The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
+
         Stack.Push(PC);
         PC = (ushort)(nnn - 2);
     }

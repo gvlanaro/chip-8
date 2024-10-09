@@ -3,7 +3,6 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
-
 public class Window : GameWindow
 {
     private const int width = 640;
@@ -35,7 +34,7 @@ public class Window : GameWindow
     };
     public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
     { 
-        emulator = new Emulator("roms/5-quirks.ch8");
+        emulator = new Emulator("roms/test4.ch8");
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     }
 
@@ -63,21 +62,24 @@ public class Window : GameWindow
     protected override void OnRenderFrame(FrameEventArgs e)
     {
         base.OnRenderFrame(e);
-
+        
         GL.Clear(ClearBufferMask.ColorBufferBit);
         
-        emulator.Cycle();
+        for (int i = 0; i < 10; i++)
+        {
+            emulator.Cycle();
+        }
         
-        checkSoundTimer();
+        CheckSoundTimer();
         
         for (int x = 0; x < 64; x++)
             for (int y = 0; y < 32; y++)
                 if (emulator.Display[x,y] == 1)
-                    drawRect(x,y);
+                    DrawRect(x,y);
         SwapBuffers();
     }
 
-    private void checkSoundTimer()
+    private void CheckSoundTimer()
     {
         if (emulator.Sound_timer > 0)
         {
@@ -85,7 +87,7 @@ public class Window : GameWindow
         }
     }
 
-    private void drawRect(int x, int y)
+    private void DrawRect(int x, int y)
     {
         // 64 to 640 and 32 to 320
         x*=10;
