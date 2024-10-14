@@ -3,6 +3,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
+using System.Diagnostics;
 public class Window : GameWindow
 {
     private const int width = 640;
@@ -34,7 +35,7 @@ public class Window : GameWindow
     };
     public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
     {
-        emulator = new Emulator("roms/test5.ch8");
+        emulator = new Emulator("roms/Brick.ch8");
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     }
 
@@ -92,8 +93,7 @@ public class Window : GameWindow
     {
         if (emulator.Sound_timer > 0)
         {
-            // TODO: doesn't work on linux
-            Console.Beep();
+            Beep_wav();
         }
     }
 
@@ -147,6 +147,18 @@ public class Window : GameWindow
         if (KeyboardState.IsKeyDown(Keys.Escape))
         {
             Close();
+        }
+    }
+
+    public void Beep_wav()
+    {
+        try
+        {
+            Process.Start("aplay", "assets/beep.wav");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
         }
     }
 }
