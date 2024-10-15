@@ -475,7 +475,6 @@ public class Emulator
     {
         // Call subroutine at nnn.
         // The interpreter increments the stack pointer, then puts the current PC on the top of the stack. The PC is then set to nnn.
-
         Stack.Push(PC);
         PC = (ushort)(nnn - 2);
     }
@@ -537,10 +536,9 @@ public class Emulator
                     {
                         V[0xF] = 1;
                     }
-                    Display[cX, cY] ^= 1;                // enable or disable the pixel (XOR operation).
+                    Display[cX, cY] ^= 1;               // enable or disable the pixel (XOR operation).
                 }
             }
-
         }
     }
 }

@@ -33,20 +33,37 @@ public class Window : GameWindow
         {54, 0xB},
         {55, 0xF}
     };
-    public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
+    public Window(int width, int height, string title, string rom_path) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
     {
-        emulator = new Emulator("roms/Brick.ch8");
+        emulator = new Emulator(rom_path);
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     }
 
     protected override void OnKeyDown(KeyboardKeyEventArgs e)
     {
-        emulator.Keys[Emu_Keys[e.ScanCode]] = true;
+        try
+        {
+            emulator.Keys[Emu_Keys[e.ScanCode]] = true;
+        }
+        catch (System.Exception)
+        {
+            
+            Debug.WriteLine("wrong button down");
+        }
+        
     }
 
     protected override void OnKeyUp(KeyboardKeyEventArgs e)
     {
-        emulator.Keys[Emu_Keys[e.ScanCode]] = false;
+        try
+        {
+            emulator.Keys[Emu_Keys[e.ScanCode]] = false;
+        }
+        catch (System.Exception)
+        {
+            
+            Debug.WriteLine("wrong button up");
+        }
     }
 
     protected override void OnLoad()
@@ -74,7 +91,13 @@ public class Window : GameWindow
         }
 
         CheckSoundTimer();
+        DrawEmulatorScreen();
 
+        SwapBuffers();
+    }
+
+    public void DrawEmulatorScreen()
+    {
         for (int x = 0; x < 64; x++)
         {
             for (int y = 0; y < 32; y++)
@@ -85,8 +108,6 @@ public class Window : GameWindow
                 }
             }
         }
-
-        SwapBuffers();
     }
 
     private void CheckSoundTimer()
@@ -154,7 +175,7 @@ public class Window : GameWindow
     {
         try
         {
-            Process.Start("aplay", "assets/beep.wav");
+            Process.Start("aplay", "assets/beep2.wav");
         }
         catch (Exception ex)
         {
