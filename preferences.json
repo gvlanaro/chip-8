@@ -1,0 +1,6 @@
+{
+    "rom_path": "<file.ch8>",
+    "bg_color": [0.0, 0.0, 0.0],
+    "pixel_color": [1.0, 1.0, 1.0],
+    "beep_sound": "assets/beep.wav"
+}

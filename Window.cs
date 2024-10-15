@@ -4,6 +4,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 using System.Diagnostics;
+using Newtonsoft.Json;
 public class Window : GameWindow
 {
     private const int width = 640;
@@ -33,8 +34,16 @@ public class Window : GameWindow
         {54, 0xB},
         {55, 0xF}
     };
-    public Window(int width, int height, string title, string rom_path) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
+
+    private string rom_path;
+    private float[] bg_color;
+    private float[] pixel_color;
+    private string beep_sound;
+    public Window(int width, int height, string title) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize = (width, height), Title = title })
     {
+        bg_color = new float[3];
+        pixel_color = new float[3];
+        LoadJson();
         emulator = new Emulator(rom_path);
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     }
@@ -43,6 +52,11 @@ public class Window : GameWindow
     {
         try
         {
+            // restart emulator
+            if (e.Key == Keys.P)
+            {
+                emulator = new Emulator(rom_path);
+            }
             emulator.Keys[Emu_Keys[e.ScanCode]] = true;
         }
         catch (System.Exception)
@@ -69,7 +83,7 @@ public class Window : GameWindow
     protected override void OnLoad()
     {
         base.OnLoad();
-        GL.ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GL.ClearColor(bg_color[0], bg_color[1], bg_color[2], 1.0f);
 
         VBO = GL.GenBuffer();
         VAO = GL.GenVertexArray();
@@ -77,6 +91,7 @@ public class Window : GameWindow
 
         _projection = Matrix4.CreateOrthographicOffCenter(0.0f, width, height, 0.0f, -1.0f, 1.0f);
         _shader.SetMatrix4("projection", _projection);
+        _shader.SetVector3("color", new Vector3(pixel_color[0], pixel_color[1], pixel_color[2]));
     }
 
     protected override void OnRenderFrame(FrameEventArgs e)
@@ -175,11 +190,29 @@ public class Window : GameWindow
     {
         try
         {
-            Process.Start("aplay", "assets/beep2.wav");
+            Process.Start("aplay", beep_sound);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    public void LoadJson()
+    {
+        using (StreamReader r = new StreamReader("preferences.json"))
+        {
+            string json = r.ReadToEnd();
+            Console.WriteLine(json);
+            dynamic array = JsonConvert.DeserializeObject(json);
+            rom_path = array["rom_path"];
+
+            for (int i = 0; i < 3; i++)
+            {
+                bg_color[i] = array["bg_color"][i];
+                pixel_color[i] = array["pixel_color"][i];
+            }
+            beep_sound = array["beep_sound"];
         }
     }
 }
