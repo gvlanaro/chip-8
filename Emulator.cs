@@ -178,6 +178,7 @@ public class Emulator
 
     private void UpdateTimers()
     {
+        // this is because for each frame there are 10 cycles
         if (TimeCounter % 10 == 0)
         {
             if (Delay_Timer > 0)

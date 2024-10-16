@@ -46,6 +46,7 @@ public class Window : GameWindow
         bg_color = new float[3];
         pixel_color = new float[3];
 
+        // used for beep sound
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             isWindows = true;
@@ -55,7 +56,9 @@ public class Window : GameWindow
             isWindows = false;
         }
 
+        // loads user settings
         LoadJson();
+
         emulator = new Emulator(rom_path);
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
     }
@@ -64,7 +67,7 @@ public class Window : GameWindow
     {
         try
         {
-            // restart emulator
+            // restart emulator with current rom
             if (e.Key == Keys.P)
             {
                 emulator = new Emulator(rom_path);
@@ -101,6 +104,7 @@ public class Window : GameWindow
         VAO = GL.GenVertexArray();
         EBO = GL.GenBuffer();
 
+        // convert opengl coordinates (-1 to 1) to (0 to width/height)
         _projection = Matrix4.CreateOrthographicOffCenter(0.0f, width, height, 0.0f, -1.0f, 1.0f);
         _shader.SetMatrix4("projection", _projection);
         _shader.SetVector3("color", new Vector3(pixel_color[0], pixel_color[1], pixel_color[2]));
@@ -112,6 +116,7 @@ public class Window : GameWindow
 
         GL.Clear(ClearBufferMask.ColorBufferBit);
 
+        // chip8 runs at 600Hz (in this case 10 every frame with 60fps)
         for (int i = 0; i < 10; i++)
         {
             emulator.Cycle();
