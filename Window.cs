@@ -15,24 +15,24 @@ public class Window : GameWindow
     private Shader _shader;
     private Matrix4 _projection;
     private Emulator emulator;
-    private Dictionary<int, byte> Emu_Keys = new Dictionary<int, byte>
+    private Dictionary<Keys, byte> Emu_Keys = new Dictionary<Keys, byte>
     {
-        {10, 0x1},
-        {11, 0x2},
-        {12, 0x3},
-        {13, 0xC},
-        {24, 0x4},
-        {25, 0x5},
-        {26, 0x6},
-        {27, 0xD},
-        {38, 0x7},
-        {39, 0x8},
-        {40, 0x9},
-        {41, 0xE},
-        {52, 0xA},
-        {53, 0x0},
-        {54, 0xB},
-        {55, 0xF}
+        {Keys.D1, 0x1},
+        {Keys.D2, 0x2},
+        {Keys.D3, 0x3},
+        {Keys.D4, 0xC},
+        {Keys.Q, 0x4},
+        {Keys.W, 0x5},
+        {Keys.E, 0x6},
+        {Keys.R, 0xD},
+        {Keys.A, 0x7},
+        {Keys.S, 0x8},
+        {Keys.D, 0x9},
+        {Keys.F, 0xE},
+        {Keys.Z, 0xA},
+        {Keys.X, 0x0},
+        {Keys.C, 0xB},
+        {Keys.V, 0xF}
     };
 
     private string rom_path;
@@ -57,7 +57,7 @@ public class Window : GameWindow
             {
                 emulator = new Emulator(rom_path);
             }
-            emulator.Keys[Emu_Keys[e.ScanCode]] = true;
+            emulator.Keys[Emu_Keys[e.Key]] = true;
         }
         catch (System.Exception)
         {
@@ -71,7 +71,7 @@ public class Window : GameWindow
     {
         try
         {
-            emulator.Keys[Emu_Keys[e.ScanCode]] = false;
+            emulator.Keys[Emu_Keys[e.Key]] = false;
         }
         catch (System.Exception)
         {
@@ -200,7 +200,7 @@ public class Window : GameWindow
 
     public void LoadJson()
     {
-        using (StreamReader r = new StreamReader("preferences.json"))
+        using (StreamReader r = new StreamReader("settings.json"))
         {
             string json = r.ReadToEnd();
             Console.WriteLine(json);
