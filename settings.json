@@ -1,5 +1,5 @@
 {
-    "rom_path": "roms/6-keypad.ch8",
+    "rom_path": "roms/Brick.ch8",
     "bg_color": [0.0, 0.0, 0.0],
     "pixel_color": [1.0, 1.0, 1.0],
     "beep_sound": "assets/beep.wav"

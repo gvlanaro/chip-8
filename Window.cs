@@ -5,6 +5,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using OpenTK.Mathematics;
 using System.Diagnostics;
 using Newtonsoft.Json;
+using System.Runtime.InteropServices;
 public class Window : GameWindow
 {
     private const int width = 640;
@@ -15,6 +16,7 @@ public class Window : GameWindow
     private Shader _shader;
     private Matrix4 _projection;
     private Emulator emulator;
+    private bool isWindows;
     private Dictionary<Keys, byte> Emu_Keys = new Dictionary<Keys, byte>
     {
         {Keys.D1, 0x1},
@@ -43,6 +45,16 @@ public class Window : GameWindow
     {
         bg_color = new float[3];
         pixel_color = new float[3];
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            isWindows = true;
+        }
+        else
+        {
+            isWindows = false;
+        }
+
         LoadJson();
         emulator = new Emulator(rom_path);
         _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
@@ -188,13 +200,21 @@ public class Window : GameWindow
 
     public void Beep_wav()
     {
-        try
+        if (isWindows)
         {
-            Process.Start("aplay", beep_sound);
+            // disabled by default because it stops the process for too long
+            //Console.Beep();
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"Error: {ex.Message}");
+            try
+            {
+                Process.Start("aplay", beep_sound);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
         }
     }
 
@@ -203,7 +223,6 @@ public class Window : GameWindow
         using (StreamReader r = new StreamReader("settings.json"))
         {
             string json = r.ReadToEnd();
-            Console.WriteLine(json);
             dynamic array = JsonConvert.DeserializeObject(json);
             rom_path = array["rom_path"];
 
