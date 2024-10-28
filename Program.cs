@@ -1,12 +1,21 @@
-﻿static class Program
+﻿using Avalonia;
+using System;
+
+namespace chip_8;
+
+sealed class Program
 {
-    static void Main(string[] args)
-    {
-        
-        using (Window window = new Window(640, 320, "chip-8"))
-        {
-            window.UpdateFrequency = 60;
-            window.Run();
-        }
-    }
+    // Initialization code. Don't use any Avalonia, third-party APIs or any
+    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
+    // yet and stuff might break.
+    [STAThread]
+    public static void Main(string[] args) => BuildAvaloniaApp()
+        .StartWithClassicDesktopLifetime(args);
+
+    // Avalonia configuration, don't remove; also used by visual designer.
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
 }
