@@ -1,3 +1,5 @@
+# C# Chip8 emulator (OpenTK)
+
 ![ibm_logo](assets/ibm_logo.png)
 
 ### Settings
