@@ -44,33 +44,11 @@ namespace chip_8
             {Keys.V, 0xF}
         };
 
-        private static string rom_path;
-        private float[] bg_color;
-        private float[] pixel_color;
-        private string beep_sound;
-        /*
-        public MainWindowGLRendering()
-        {
-            bg_color = new float[3];
-            pixel_color = new float[3];
+        public static string rom_path;
+        private static float[] bg_color;
+        private static float[] pixel_color;
+        public static string beep_sound;
 
-            // used for beep sound
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                isWindows = true;
-            }
-            else
-            {
-                isWindows = false;
-            }
-
-            // loads user settings
-            LoadJson();
-
-            emulator = new Emulator(rom_path);
-            _shader = new Shader("shaders/shader.vert", "shaders/shader.frag");
-        }
-        */
         protected override void OpenTkInit()
         {
             bg_color = new float[3];
@@ -111,10 +89,8 @@ namespace chip_8
         {
             GL.Enable(EnableCap.DepthTest);
             GL.Enable(EnableCap.CullFace);
-
+            
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            //GL.Clear(ClearBufferMask.ColorBufferBit);
 
             // chip8 runs at 600Hz (in this case 10 every frame with 60fps)
             for (int i = 0; i < 10; i++)
@@ -227,6 +203,12 @@ namespace chip_8
         public static void RestartEmulator()
         {
             emulator = new Emulator(rom_path);
+        }
+
+        public static void changeBgColor(float[] newColor)
+        {
+            bg_color = newColor;
+            GL.ClearColor(bg_color[0], bg_color[1], bg_color[2], 1.0f);
         }
     }
 }

@@ -4,12 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:rootns="clr-namespace:chip_8"
-        mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="320"
+        mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="352"
         x:Class="chip_8.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="chip-8"
         Width="640"
-        Height="320">
+        Height="352">
 
     <Design.DataContext>
         <!-- This only sets the DataContext for the previewer in an IDE,
@@ -21,13 +21,17 @@
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="_Open..."/>
+                <MenuItem Header="Open Rom..." Click="OpenRomClick"/>
+                <MenuItem Header="Restart Emulator" Click="RestartEmuClick"/>
                 <Separator/>
-                <MenuItem Header="_Exit"/>
+                <MenuItem Header="Exit" Click="ExitClick"/>
             </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="Copy"/>
-                <MenuItem Header="Paste"/>
+            <MenuItem Header="tools">
+                <MenuItem Header="preferences" Click="PreferencesClick"/>
+                <MenuItem Header="debug window"/>
+            </MenuItem>
+            <MenuItem Header="about">
+                <MenuItem Header="about"/>
             </MenuItem>
         </Menu>
         <rootns:MainWindowGLRendering Focusable="True" Name="EmulatorGLArea"/>

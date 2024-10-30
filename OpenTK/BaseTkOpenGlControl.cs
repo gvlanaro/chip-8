@@ -9,6 +9,7 @@ using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using Avalonia.Threading;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Platform.Windows;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace chip_8;
@@ -102,7 +103,6 @@ public abstract class BaseTkOpenGlControl : OpenGlControlBase, ICustomHitTest
         //Initialize the OpenTK<->Avalonia Bridge
         _avaloniaTkContext = new AvaloniaTkContext(gl);
         GL.LoadBindings(_avaloniaTkContext);
-
         //Invoke the subclass' init function
         OpenTkInit();
     }
