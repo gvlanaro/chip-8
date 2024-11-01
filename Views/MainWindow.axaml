@@ -31,7 +31,7 @@
                 <MenuItem Header="debug window"/>
             </MenuItem>
             <MenuItem Header="about">
-                <MenuItem Header="about"/>
+                <MenuItem Header="about" Click="AboutClick"/>
             </MenuItem>
         </Menu>
         <rootns:MainWindowGLRendering Focusable="True" Name="EmulatorGLArea"/>

@@ -17,12 +17,6 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = ViewModel;
     }
-
-    private void OpenRasdomClick(object? sender, RoutedEventArgs e)
-    {
-        Console.WriteLine("OpenRomClick");
-    }
-    
     private async void OpenRomClick(object sender, RoutedEventArgs args)
     {
         // Get top level from the current control. Alternatively, you can use Window reference instead.
@@ -37,14 +31,14 @@ public partial class MainWindow : Window
 
         if (files.Count >= 1)
         {
-            MainWindowGLRendering.rom_path = files[0].Path.AbsolutePath;
-            MainWindowGLRendering.RestartEmulator();
+            EmulatorGLArea.rom_path = files[0].Path.AbsolutePath;
+            EmulatorGLArea.RestartEmulator();
         }
     }
 
     private void RestartEmuClick(object? sender, RoutedEventArgs e)
     {
-        MainWindowGLRendering.RestartEmulator();
+        EmulatorGLArea.RestartEmulator();
     }
 
     private void ExitClick(object? sender, RoutedEventArgs e)
@@ -54,6 +48,11 @@ public partial class MainWindow : Window
 
     private void PreferencesClick(object? sender, RoutedEventArgs e)
     {
-        new PreferencesWindow().ShowDialog(this);
+        new PreferencesWindow(EmulatorGLArea).ShowDialog(this);
+    }
+
+    private void AboutClick(object? sender, RoutedEventArgs e)
+    {
+        new AboutWindow().ShowDialog(this);
     }
 }

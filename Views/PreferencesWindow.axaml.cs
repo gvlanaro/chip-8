@@ -10,9 +10,11 @@ namespace chip_8.Views;
 
 public partial class PreferencesWindow : Window
 {
-    public PreferencesWindow()
+    private MainWindowGLRendering emulatorGlArea;
+    public PreferencesWindow(MainWindowGLRendering _emulatorGlArea)
     {
         InitializeComponent();
+        emulatorGlArea = _emulatorGlArea;
     }
 
     private async void OpenSoundClick(object? sender, RoutedEventArgs e)
@@ -30,13 +32,18 @@ public partial class PreferencesWindow : Window
 
         if (files.Count >= 1)
         {
-            MainWindowGLRendering.beep_sound = files[0].Path.AbsolutePath;
-            MainWindowGLRendering.RestartEmulator();
+            emulatorGlArea.beep_sound = files[0].Path.AbsolutePath;
+            emulatorGlArea.RestartEmulator();
         }
     }
 
     private void UpdateBgColor(object? sender, ColorChangedEventArgs e)
     {
-        MainWindowGLRendering.changeBgColor([e.NewColor.R, e.NewColor.G, e.NewColor.B]);
+        emulatorGlArea.changeBgColor([(float)(e.NewColor.R/255.0), (float)(e.NewColor.G/255.0), (float)(e.NewColor.B/255.0)]);
+    }
+
+    private void UpdatePixelColor(object? sender, ColorChangedEventArgs e)
+    {
+        emulatorGlArea.changePixelColor([(float)(e.NewColor.R/255.0), (float)(e.NewColor.G/255.0), (float)(e.NewColor.B/255.0)]);
     }
 }

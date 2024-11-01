@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
+using chip_8.Common;
 using Newtonsoft.Json;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -24,31 +24,54 @@ namespace chip_8
         private Matrix4 _projection;
         public static Emulator emulator;
         private bool isWindows;
-        private Dictionary<Keys, byte> Emu_Keys = new Dictionary<Keys, byte>
+        private Dictionary<Key, byte> Emu_Keys = new Dictionary<Key, byte>
         {
-            {Keys.D1, 0x1},
-            {Keys.D2, 0x2},
-            {Keys.D3, 0x3},
-            {Keys.D4, 0xC},
-            {Keys.Q, 0x4},
-            {Keys.W, 0x5},
-            {Keys.E, 0x6},
-            {Keys.R, 0xD},
-            {Keys.A, 0x7},
-            {Keys.S, 0x8},
-            {Keys.D, 0x9},
-            {Keys.F, 0xE},
-            {Keys.Z, 0xA},
-            {Keys.X, 0x0},
-            {Keys.C, 0xB},
-            {Keys.V, 0xF}
+            {Key.D1, 0x1},
+            {Key.D2, 0x2},
+            {Key.D3, 0x3},
+            {Key.D4, 0xC},
+            {Key.Q, 0x4},
+            {Key.W, 0x5},
+            {Key.E, 0x6},
+            {Key.R, 0xD},
+            {Key.A, 0x7},
+            {Key.S, 0x8},
+            {Key.D, 0x9},
+            {Key.F, 0xE},
+            {Key.Z, 0xA},
+            {Key.X, 0x0},
+            {Key.C, 0xB},
+            {Key.V, 0xF}
         };
 
-        public static string rom_path;
-        private static float[] bg_color;
-        private static float[] pixel_color;
-        public static string beep_sound;
+        public string rom_path;
+        private float[] bg_color;
+        private float[] pixel_color;
+        public string beep_sound;
 
+        public MainWindowGLRendering()
+        {
+            MessageBroker.RestartReceived += OnRestartReceived;
+        }
+
+        private void OnRestartReceived(object? sender, EventArgs e)
+        {
+            RestartEmulator();
+        }
+
+        private void OnKeyUpReceived(object? sender, Key key)
+        {
+            emulator.Keys[Emu_Keys[key]] = false;
+        }
+
+        private void OnKeyDownReceived(object? sender, Key key)
+        {
+            if (key == Key.P)
+            {
+                RestartEmulator();
+            }
+            emulator.Keys[Emu_Keys[key]] = true;
+        }
         protected override void OpenTkInit()
         {
             bg_color = new float[3];
@@ -82,13 +105,9 @@ namespace chip_8
             _shader.SetVector3("color", new Vector3(pixel_color[0], pixel_color[1], pixel_color[2]));
         }
 
-
-
         //OpenTkRender (OnRenderFrame) is called once a frame. The aspect ratio and keyboard state are configured prior to this being called.
         protected override void OpenTkRender()
         {
-            GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.CullFace);
             
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -101,8 +120,8 @@ namespace chip_8
             CheckSoundTimer();
             DrawEmulatorScreen();
             
-            GL.Disable(EnableCap.DepthTest); 
-
+            _shader.SetVector3("color", new Vector3(pixel_color[0], pixel_color[1], pixel_color[2]));
+            GL.ClearColor(bg_color[0], bg_color[1], bg_color[2], 1.0f);
         }
         public void DrawEmulatorScreen()
         {
@@ -117,7 +136,6 @@ namespace chip_8
                 }
             }
         }
-
         private void CheckSoundTimer()
         {
             if (emulator.Sound_timer > 0)
@@ -125,7 +143,6 @@ namespace chip_8
                 //Beep_wav();
             }
         }
-
         private void DrawRect(int x, int y)
         {
             // 64 to 640 and 32 to 320
@@ -162,7 +179,6 @@ namespace chip_8
 
             GL.DrawElements(PrimitiveType.Triangles, _indices.Length, DrawElementsType.UnsignedInt, 0);
         }
-        
         public void Beep_wav()
         {
             if (isWindows)
@@ -182,7 +198,6 @@ namespace chip_8
                 }
             }
         }
-
         public void LoadJson()
         {
             using (StreamReader r = new StreamReader("settings.json"))
@@ -199,16 +214,18 @@ namespace chip_8
                 beep_sound = array["beep_sound"];
             }
         }
-
-        public static void RestartEmulator()
+        public void RestartEmulator()
         {
             emulator = new Emulator(rom_path);
         }
-
-        public static void changeBgColor(float[] newColor)
+        public void changeBgColor(float[] color)
         {
-            bg_color = newColor;
-            GL.ClearColor(bg_color[0], bg_color[1], bg_color[2], 1.0f);
+            bg_color = color;
+        }
+
+        public void changePixelColor(float[] color)
+        {
+            pixel_color = color;
         }
     }
 }

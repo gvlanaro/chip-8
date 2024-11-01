@@ -8,6 +8,7 @@ using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
 using Avalonia.Rendering;
 using Avalonia.Threading;
+using chip_8.Common;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Platform.Windows;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -122,7 +123,7 @@ public abstract class BaseTkOpenGlControl : OpenGlControlBase, ICustomHitTest
         {
             if (e.Key == Key.P)
             {
-                MainWindowGLRendering.RestartEmulator();
+                MessageBroker.SendRestart(null);
             }
             MainWindowGLRendering.emulator.Keys[Emu_Keys[e.Key]] = true;
         }

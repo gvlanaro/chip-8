@@ -28,7 +28,7 @@
                         <Label>Background Color:</Label>
                         <ColorPicker Width="200" Height="30" Name="bgPicker" HorizontalAlignment="Left" ColorChanged="UpdateBgColor"/>
                         <Label Height="">Pixel Color:</Label>
-                        <ColorPicker Width="200" Height="30" Name="pixelPicker" HorizontalAlignment="Left"/>
+                        <ColorPicker Width="200" Height="30" Name="pixelPicker" HorizontalAlignment="Left" ColorChanged="UpdatePixelColor"/>
                         <Separator Margin="20"></Separator>
                         <StackPanel Orientation="Horizontal" Spacing="40">
                                 <Label HorizontalAlignment="Left" VerticalAlignment="Bottom">Beep Sound (wav file):</Label>
